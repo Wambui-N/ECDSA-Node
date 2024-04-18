@@ -1,6 +1,11 @@
-const express = require("express");
+//const express = require("express");
+import express from "express";
+//const cors = require("cors");
+import cors from "cors";
+import { secp256k1 } from "ethereum-cryptography/secp256k1.js";
+
+
 const app = express();
-const cors = require("cors");
 const port = 3042;
 
 app.use(cors());
