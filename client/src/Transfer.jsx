@@ -2,6 +2,8 @@ import { useState } from "react";
 import server from "./server";
 import { hexToBytes, toHex, utf8ToBytes } from "ethereum-cryptography/utils.js";
 import { keccak256 } from "ethereum-cryptography/keccak.js";
+import { secp256k1 } from "ethereum-cryptography/secp256k1.js";
+
 
 function Transfer({ address, setBalance }) {
   const [sendAmount, setSendAmount] = useState("");
@@ -32,9 +34,10 @@ function Transfer({ address, setBalance }) {
         data: { privateKey },
       } = await server.get(`balance/${address}`);
       setPrivateKey(privateKey);
-      return secp.sign(dataHash, privateKey, { recovered: true });
+      const { r, s, v } = secp256k1.sign(dataHash, privateKey);
+      return {r, s, v};
     } catch (error) {
-      console.error("Error signing transaction:", error);
+      console.log("Error signing transaction:", error);
     }
   }
 
