@@ -6,6 +6,7 @@ import { keccak256 } from "ethereum-cryptography/keccak.js";
 function Transfer({ address, setBalance }) {
   const [sendAmount, setSendAmount] = useState("");
   const [recipient, setRecipient] = useState("");
+  const [privateKey, setPrivateKey] = useState("");
 
   const setValue = (setter) => (evt) => setter(evt.target.value);
 
@@ -13,22 +14,28 @@ function Transfer({ address, setBalance }) {
     evt.preventDefault();
 
     try {
+      //send transaction to server
+      const signature = await signTransaction(sendAmount, recipient, address);
       const {
-        data: { balance },
-      } = await server.post(`send`, {
-        sender: address,
-        amount: parseInt(sendAmount),
-        recipient,
-      });
+        data: { balance },} = await server.post(`send`, {sender: address, amount: parseInt(sendAmount), recipient, signature});
       setBalance(balance);
     } catch (ex) {
       alert(ex.response.data.message);
     }
   }
 
-  function signTransaction() {
-    // sign transaction
-    const dataHash = keccak256(utf8ToBytes(sendAmount + recipient + address));
+  async function signTransaction(sendAmount, recipient, address) {
+    try {
+      // sign transaction
+      const dataHash = keccak256(utf8ToBytes(sendAmount + recipient + address));
+      const {
+        data: { privateKey },
+      } = await server.get(`balance/${address}`);
+      setPrivateKey(privateKey);
+      return secp.sign(dataHash, privateKey, { recovered: true });
+    } catch (error) {
+      console.error("Error signing transaction:", error);
+    }
   }
 
   return (
