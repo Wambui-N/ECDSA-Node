@@ -1,5 +1,7 @@
 import { useState } from "react";
 import server from "./server";
+import { hexToBytes, toHex, utf8ToBytes } from "ethereum-cryptography/utils.js";
+import { keccak256 } from "ethereum-cryptography/keccak.js";
 
 function Transfer({ address, setBalance }) {
   const [sendAmount, setSendAmount] = useState("");
@@ -23,7 +25,11 @@ function Transfer({ address, setBalance }) {
       alert(ex.response.data.message);
     }
   }
-  console.log(sendAmount, recipient, address)
+
+  function signTransaction() {
+    // sign transaction
+    const dataHash = keccak256(utf8ToBytes(sendAmount + recipient + address));
+  }
 
   return (
     <form className="container transfer" onSubmit={transfer}>
