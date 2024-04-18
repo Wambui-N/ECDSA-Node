@@ -7,10 +7,25 @@ app.use(cors());
 app.use(express.json());
 
 const balances = {
-  "0x1": 100,
-  "0x2": 50,
-  "0x3": 75,
+  "0x1": { balance: 100, privateKey: "", publicKey: "", address: "0x1" },
+  "0x2": { balance: 50, privateKey: "", publicKey: "", address: "0x2" },
+  "0x3": { balance: 75, privateKey: "", publicKey: "", address: "0x3" },
 };
+
+//generate a key pair
+for (const address in balances) {
+  const privateKeyObject = secp256k1.utils.randomPrivateKey();
+  const privateKey = Object.values(privateKeyObject)
+    .map((value) => value.toString(16).padStart(2, "0"))
+    .join("");
+  balances[address].privateKey = privateKey;
+
+  const publicKeyObject = secp256k1.getPublicKey(privateKey);
+  const publicKey = Object.values(publicKeyObject)
+    .map((value) => value.toString(16).padStart(2, "0"))
+    .join("");
+  balances[address].publicKey = publicKey;
+}
 
 app.get("/balance/:address", (req, res) => {
   const { address } = req.params;
