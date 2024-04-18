@@ -23,6 +23,7 @@ function Transfer({ address, setBalance }) {
       alert(ex.response.data.message);
     }
   }
+  console.log(sendAmount, recipient, address)
 
   return (
     <form className="container transfer" onSubmit={transfer}>
